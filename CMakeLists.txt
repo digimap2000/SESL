@@ -19,6 +19,8 @@ set(RINGBUF_SOURCES
 
 set(TEST_SOURCES
     test/test_se_ringbuf.c
+    test/test_se_ringbuf_observer.c
+    test/test_all.c
 )
 
 # Define the test executable

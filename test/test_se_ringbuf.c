@@ -373,7 +373,7 @@ static void test_memory_overlap() {
         assert(buffer[i] == i + 1);
 }
 
-int main(void) {
+int test_se_ringbuf_main(void) {
     test_basic_write_read();
     test_overflow();
     test_clear();
