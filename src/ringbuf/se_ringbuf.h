@@ -41,6 +41,9 @@
 extern "C" {
 #endif
 
+// C99 compliant forward declarations
+struct se_ringbuf_observer_t;
+
 /**
  * @brief Ring buffer structure.
  * @note Do not access members directly; use the API functions.
@@ -50,6 +53,7 @@ typedef struct se_ringbuf_t {
     uint16_t capacity;    /**< Buffer capacity in bytes */
     uint16_t head;        /**< Write index */
     uint16_t count;       /**< Number of bytes currently in buffer */
+    const struct se_ringbuf_observer_t *observer; /**< Optional observer interface */
 } se_ringbuf_t;
 
 /**

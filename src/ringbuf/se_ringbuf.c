@@ -1,4 +1,5 @@
 #include "se_ringbuf.h"
+#include "se_ringbuf_internal.h"
 
 static inline void se_ringbuf_memcpy(uint8_t *dst, const uint8_t *src, uint16_t n)
 {
@@ -10,10 +11,12 @@ bool se_ringbuf_init(se_ringbuf_t *rb, void *buffer, uint16_t capacity)
 {
     if (rb)
     {
+        rb->observer = NULL;
         rb->buffer = (uint8_t *)buffer;
         rb->capacity = capacity;
         rb->head = 0;
         rb->count = 0;
+        se_ringbuf_notify_init(rb);
     }
     return rb && rb->buffer && rb->capacity;
 }
@@ -24,6 +27,7 @@ void se_ringbuf_clear(se_ringbuf_t *rb)
     {
         rb->head = 0;
         rb->count = 0;
+        se_ringbuf_notify_clear(rb);
     }
 }
 
@@ -65,6 +69,8 @@ uint16_t se_ringbuf_write(se_ringbuf_t *rb, const void *data, uint16_t count)
 
     rb->head = (head + to_write < rb->capacity) ? (head + to_write) : (head + to_write - rb->capacity);
     rb->count += to_write;
+    
+    se_ringbuf_notify_write(rb, to_write);
     return to_write;
 }
 
@@ -89,5 +95,6 @@ uint16_t se_ringbuf_read(se_ringbuf_t *rb, void *data, uint16_t count)
         se_ringbuf_memcpy((uint8_t *)data + first, &rb->buffer[0], to_read - first);
 
     rb->count -= to_read;
+    se_ringbuf_notify_read(rb, to_read);
     return to_read;
 }
