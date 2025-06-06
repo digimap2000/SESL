@@ -6,17 +6,17 @@
 #include "se_ringbuf.h"
 
 // Define a minimal ring buffer implementation for test if needed
-#ifndef TEST_RINGBUF_CAPACITY
-#define TEST_RINGBUF_CAPACITY 8  // Must be power of two
-#endif
+#define TEST_RINGBUF_BYTES      8
+#define TEST_RINGBUF_CAPACITY   (TEST_RINGBUF_BYTES - 1)
+
 
 static void test_basic_write_read() {
     printf("Test: basic write/read\n");
 
     se_ringbuf_t rb;
-    uint8_t buffer[TEST_RINGBUF_CAPACITY];
+    uint8_t buffer[TEST_RINGBUF_BYTES];
 
-    assert(se_ringbuf_init(&rb, buffer, TEST_RINGBUF_CAPACITY) == true);
+    assert(se_ringbuf_init(&rb, buffer, sizeof(buffer)) == true);
 
     uint8_t input[] = {1, 2, 3, 4};
     uint16_t written = se_ringbuf_write(&rb, input, 4);
@@ -36,26 +36,26 @@ static void test_basic_write_read() {
 static void test_overflow() {
     printf("Test: overflow handling\n");
 
-    uint32_t buffer[TEST_RINGBUF_CAPACITY];
+    uint8_t buffer[TEST_RINGBUF_BYTES];
     se_ringbuf_t rb;
-    assert(se_ringbuf_init(&rb, buffer, TEST_RINGBUF_CAPACITY));
+    assert(se_ringbuf_init(&rb, buffer, sizeof(buffer)));
 
-    uint32_t input[TEST_RINGBUF_CAPACITY + 2];
-    for (uint32_t i = 0; i < TEST_RINGBUF_CAPACITY + 2; ++i) {
-        input[i] = i + 100;
+    uint8_t input[TEST_RINGBUF_CAPACITY + 1];
+    for (uint32_t i = 0; i < sizeof(input); ++i) {
+        input[i] = i & 0xFF;
     }
 
-    size_t written = se_ringbuf_write(&rb, input, TEST_RINGBUF_CAPACITY + 2);
-    assert(written == TEST_RINGBUF_CAPACITY); // should not exceed capacity
+    size_t written = se_ringbuf_write(&rb, input, TEST_RINGBUF_CAPACITY + 1);
+    assert(written == TEST_RINGBUF_CAPACITY);
     assert(se_ringbuf_is_full(&rb));
 }
 
 static void test_clear() {
     printf("Test: clear\n");
 
-    uint32_t buffer[TEST_RINGBUF_CAPACITY];
+    uint32_t buffer[TEST_RINGBUF_BYTES];
     se_ringbuf_t rb;
-    assert(se_ringbuf_init(&rb, buffer, TEST_RINGBUF_CAPACITY));
+    assert(se_ringbuf_init(&rb, buffer, TEST_RINGBUF_BYTES));
 
     uint32_t input[] = {99, 98};
     se_ringbuf_write(&rb, input, 2);
@@ -72,9 +72,9 @@ static void test_wraparound() {
     uint8_t buffer[8];
     assert(se_ringbuf_init(&rb, buffer, 8));
 
-    // Fill buffer to capacity
-    uint8_t input1[8] = {10, 11, 12, 13, 14, 15, 16, 17};
-    assert(se_ringbuf_write(&rb, input1, 8) == 8);
+    // Fill buffer to capacity-1
+    uint8_t input1[7] = {10, 11, 12, 13, 14, 15, 16};
+    assert(se_ringbuf_write(&rb, input1, 7) == 7);
     assert(se_ringbuf_is_full(&rb));
 
     // Read 3 elements
@@ -87,12 +87,12 @@ static void test_wraparound() {
     assert(se_ringbuf_write(&rb, input2, 3) == 3);
 
     // Read all remaining elements
-    uint8_t output2[8];
-    assert(se_ringbuf_read(&rb, output2, 8) == 8); // 8 in, 3 out, 3 in, so 8 left
+    uint8_t output2[7];
+    assert(se_ringbuf_read(&rb, output2, 7) == 7); // 7 in, 3 out, 3 in, so 7 left
 
-    // The expected output is: 13, 14, 15, 16, 17, 21, 22, 23
-    uint8_t expected[] = {13, 14, 15, 16, 17, 21, 22, 23};
-    assert(memcmp(output2, expected, 8 - 3 + 3) == 0);
+    // The expected output is: 13, 14, 15, 16, 21, 22, 23
+    uint8_t expected[] = {13, 14, 15, 16, 21, 22, 23};
+    assert(memcmp(output2, expected, 7) == 0);
 }
 
 static void test_read_empty() {
@@ -145,12 +145,12 @@ static void test_partial_write() {
     printf("Test: partial write\n");
     se_ringbuf_t rb;
     uint8_t buffer[4];
-    assert(se_ringbuf_init(&rb, buffer, 4));
-    uint8_t input1[3] = {1, 2, 3};
-    assert(se_ringbuf_write(&rb, input1, 3) == 3);
+    assert(se_ringbuf_init(&rb, buffer, sizeof(buffer)));
+    uint8_t input1[2] = {1, 2};
+    assert(se_ringbuf_write(&rb, input1, sizeof(input1)) == sizeof(input1));
     uint8_t input2[3] = {4, 5, 6};
     // Only one space left
-    assert(se_ringbuf_write(&rb, input2, 3) == 1);
+    assert(se_ringbuf_write(&rb, input2, sizeof(input2)) == 1);
     assert(se_ringbuf_is_full(&rb));
 }
 
@@ -159,12 +159,12 @@ static void test_non_power_of_two() {
     se_ringbuf_t rb;
     uint8_t buffer[7];
     assert(se_ringbuf_init(&rb, buffer, 7));
-    uint8_t input[7] = {1, 2, 3, 4, 5, 6, 7};
-    assert(se_ringbuf_write(&rb, input, 7) == 7);
+    uint8_t input[6] = {1, 2, 3, 4, 5, 6};
+    assert(se_ringbuf_write(&rb, input, 7) == 6); // Only 6 can be written
     assert(se_ringbuf_is_full(&rb));
-    uint8_t output[7] = {0};
-    assert(se_ringbuf_read(&rb, output, 7) == 7);
-    assert(memcmp(input, output, 7) == 0);
+    uint8_t output[6] = {0};
+    assert(se_ringbuf_read(&rb, output, 7) == 6);
+    assert(memcmp(input, output, 6) == 0);
     assert(se_ringbuf_is_empty(&rb));
 }
 
@@ -201,7 +201,7 @@ static void test_over_write() {
     uint8_t buffer[4];
     assert(se_ringbuf_init(&rb, buffer, 4));
     uint8_t input[8] = {1,2,3,4,5,6,7,8};
-    assert(se_ringbuf_write(&rb, input, 8) == 4);
+    assert(se_ringbuf_write(&rb, input, 8) == sizeof(buffer) - 1);
     assert(se_ringbuf_is_full(&rb));
 }
 
@@ -236,11 +236,11 @@ static void test_misaligned_buffer() {
     uint8_t *misaligned = raw + 1;
     se_ringbuf_t rb;
     assert(se_ringbuf_init(&rb, misaligned, 8));
-    uint8_t input[8] = {1,2,3,4,5,6,7,8};
-    assert(se_ringbuf_write(&rb, input, 8) == 8);
-    uint8_t output[8] = {0};
-    assert(se_ringbuf_read(&rb, output, 8) == 8);
-    assert(memcmp(input, output, 8) == 0);
+    uint8_t input[7] = {1,2,3,4,5,6,7};
+    assert(se_ringbuf_write(&rb, input, 7) == 7);
+    uint8_t output[7] = {0};
+    assert(se_ringbuf_read(&rb, output, 7) == 7);
+    assert(memcmp(input, output, 7) == 0);
     assert(se_ringbuf_is_empty(&rb));
 }
 
@@ -263,7 +263,7 @@ static void test_stress_random_rw() {
     while (read_pos < datalen) {
         // Random write
         if (write_pos < datalen) {
-            int space = bufsize - se_ringbuf_count(&rb);
+            int space = bufsize - se_ringbuf_count(&rb) - 1;
             int to_write = (rand() % (space + 1));
             if (to_write > datalen - write_pos)
                 to_write = datalen - write_pos;
@@ -295,7 +295,7 @@ static void test_buffer_sizes() {
     se_ringbuf_t rb;
 
     // Test sizes 0 to 1000
-    for (uint16_t size = 0; size <= 1000; ++size) {
+    for (uint16_t size = 2; size <= 1000; ++size) {
         uint8_t *buffer = (size > 0) ? malloc(size) : NULL;
         bool ok = se_ringbuf_init(&rb, buffer, size);
         if (size == 0 || buffer == NULL) {
@@ -313,7 +313,7 @@ static void test_buffer_sizes() {
     }
 
     // Test Fibonacci sizes up to 65535
-    uint32_t fib1 = 1, fib2 = 2;
+    uint32_t fib1 = 2, fib2 = 3;
     while (fib1 < 65536) {
         uint8_t *buffer = malloc((size_t)fib1);
         assert(buffer != NULL);

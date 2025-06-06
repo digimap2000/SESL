@@ -52,7 +52,7 @@ typedef struct se_ringbuf_t {
     uint8_t *buffer;      /**< Pointer to buffer memory */
     uint16_t capacity;    /**< Buffer capacity in bytes */
     uint16_t head;        /**< Write index */
-    uint16_t count;       /**< Number of bytes currently in buffer */
+    uint16_t tail;        /**< Read index */
     const struct se_ringbuf_observer_t *observer; /**< Optional observer interface */
 } se_ringbuf_t;
 

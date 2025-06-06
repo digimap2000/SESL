@@ -4,12 +4,12 @@ project(SELS_RingBuffer_Test C)
 # Enable more warnings for safety
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
-add_compile_options(-Wall -Wextra)
+add_compile_options(-Wall -Wextra -Os)
 
 include_directories(src/ringbuf)
 
 # For debug symbols
-set(CMAKE_BUILD_TYPE Debug)
+# set(CMAKE_BUILD_TYPE Debug)
 
 # Add source files
 set(RINGBUF_SOURCES
