@@ -2,5 +2,9 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
+    // Initialize any global application services
+    env_logger::init();
+
+    // Running our tauri application library interface
     uscope_lib::run()
 }
