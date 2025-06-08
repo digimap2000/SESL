@@ -1,37 +1,37 @@
 import { useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { Button, Input, Heading, Text, VStack, HStack, Box } from "@chakra-ui/react";
+import { Button, VStack, Box } from "@chakra-ui/react";
 import MainMenu from "./components/ui/mainmenu";
 import "./App.css";
 
 function App() {
-    const [greetMsg, setGreetMsg] = useState("");
-    const [name, setName] = useState("");
+    const [fetchResult, setFetchResult] = useState<any>(null);
 
-    async function greet() {
-        setGreetMsg(await invoke("greet", { name }));
+    async function testFetch() {
+        const url = 'http://192.168.1.104:15081';
+        try {
+            const result = await invoke('fetch_json_as_kv', { url });
+            setFetchResult(result);
+        } catch (err) {
+            setFetchResult({ error: String(err) });
+        }
     }
 
     return (
         <>
             <MainMenu />
-            <Box minH="100vh" display="flex" alignItems="center" justifyContent="center">
-                <VStack w="100%" maxW="md" p={8} borderRadius="lg" boxShadow="lg">
-                    <Heading>Welcome to Tauri + React + Chakra</Heading>
-                    <HStack w="100%">
-                        <Input
-                            id="greet-input"
-                            value={name}
-                            onChange={(e) => setName(e.currentTarget.value)}
-                            placeholder="Enter a name..."
-                        />
-                        <Button colorScheme="blue" onClick={greet}>
-                            Greet
-                        </Button>
-                    </HStack>
-                    <Text>{greetMsg}</Text>
-                </VStack>
-            </Box>
+            <VStack w="100%" maxW="md" p={8}>
+                <Button colorScheme="blue" onClick={testFetch}>
+                    Refresh
+                </Button>
+                {fetchResult && (
+                    <Box w="100%" mt={4} p={4} borderRadius="md" fontSize="sm" whiteSpace="pre-wrap">
+                        {typeof fetchResult === "object"
+                            ? JSON.stringify(fetchResult, null, 2)
+                            : String(fetchResult)}
+                    </Box>
+                )}
+            </VStack>
         </>
     );
 }
