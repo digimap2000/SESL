@@ -1,14 +1,8 @@
-import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { Button, VStack, Box, List, ListItem, Heading } from "@chakra-ui/react";
+import { useState } from "react";
+import { Button, VStack, Box } from "@chakra-ui/react";
 import MainMenu from "./components/ui/mainmenu";
 import "./App.css";
-
-type MdnsDevice = {
-    name: string;
-    ip: string;
-    port: number | null;
-};
 
 function App() {
     const [fetchResult, setFetchResult] = useState<any>(null);
