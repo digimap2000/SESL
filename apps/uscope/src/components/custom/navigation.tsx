@@ -1,14 +1,13 @@
 import {
     NavigationMenu,
     NavigationMenuItem,
-    NavigationMenuLink,
     NavigationMenuList,
 } from "@/components/ui/navigation-menu"
 import { ThemeToggle } from "@/components/custom/theming"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
-import { Routes, Route, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export function VersionPill(): JSX.Element {
     return (
