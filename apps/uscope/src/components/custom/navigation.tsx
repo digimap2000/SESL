@@ -8,6 +8,7 @@ import { ThemeToggle } from "@/components/custom/theming"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
+import { Routes, Route, Link } from 'react-router-dom';
 
 export function VersionPill(): JSX.Element {
     return (
@@ -34,22 +35,20 @@ export function NavBar(): JSX.Element {
         <nav className="fixed top-0 left-0 right-0 px-4 py-2 backdrop-blur-xl backdrop-opacity-100 border-b border-gray-500 z-50">
             <div className="flex items-center space-x-4">
                 {/* Brand */}
-                <a href="/" className="text-xl font-bold">
-                    uScope
-                </a>
+                <Link to="/" className="text-lg font-bold">uScope</Link>
 
                 {/* Navigation menu */}
                 <div className="flex-1">
-                    <NavigationMenu>
+                    <NavigationMenu  className="text-sm">
                         <NavigationMenuList className="flex space-x-4">
-                            <NavigationMenuItem>
-                                <NavigationMenuLink href="watch">Discovery</NavigationMenuLink>
+                            <NavigationMenuItem asChild>
+                                <Link to="/watch">Discovery</Link>
                             </NavigationMenuItem>
-                            <NavigationMenuItem>
-                                <NavigationMenuLink href="something">Something</NavigationMenuLink>
+                            <NavigationMenuItem asChild>
+                                <Link to="/something">Something</Link>
                             </NavigationMenuItem>
-                            <NavigationMenuItem>
-                                <NavigationMenuLink href="about">About</NavigationMenuLink>
+                            <NavigationMenuItem asChild>
+                                <Link to="/about">About</Link>
                             </NavigationMenuItem>
                         </NavigationMenuList>
                     </NavigationMenu>
