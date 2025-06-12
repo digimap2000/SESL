@@ -1,46 +1,39 @@
-import { invoke } from "@tauri-apps/api/core";
 import { useState } from "react";
-import { Button, VStack, Box } from "@chakra-ui/react";
-import MainMenu from "./components/ui/mainmenu";
+import { invoke } from "@tauri-apps/api/core";
+import { Button } from "@/components/ui/button";
+import { NavBar } from "@/components/custom/navigation";
+import { ProductCard } from "./components/custom/cards";
 import "./App.css";
 
 function App() {
-    const [fetchResult, setFetchResult] = useState<any>(null);
+    const [deviceList, setDeviceList] = useState<any>(null);
 
-    async function testHello() {
+    async function refreshDevices() {
         try {
-            const devices = await invoke('fetch_device_list', { });
-            setFetchResult(devices);
+            const devices = await invoke('fetch_device_list', {});
+            let parsedDevices = devices;
+            if (typeof devices === "string") {
+                parsedDevices = JSON.parse(devices);
+            }
+            setDeviceList(parsedDevices);
         } catch (err) {
-            setFetchResult({ error: String(err) });
-        }
-    }
-
-    async function testFetch() {
-        const url = 'http://192.168.1.104:15081';
-        try {
-            const result = await invoke('fetch_json_as_kv', { url });
-            setFetchResult(result);
-        } catch (err) {
-            setFetchResult({ error: String(err) });
+            setDeviceList({ error: String(err) });
         }
     }
 
     return (
-        <>
-            <MainMenu />
-            <VStack w="100%" maxW="md" p={8}>
-                <Button colorScheme="blue" onClick={testFetch}>Refresh</Button>
-                <Button colorScheme="blue" onClick={testHello}>Hello</Button>
-                {fetchResult && (
-                    <Box w="100%" mt={4} p={4} borderRadius="md" fontSize="sm" whiteSpace="pre-wrap">
-                        {typeof fetchResult === "object"
-                            ? JSON.stringify(fetchResult, null, 2)
-                            : String(fetchResult)}
-                    </Box>
-                )}
-            </VStack>
-        </>
+        <main className="flex flex-col min-h-screen items-center justify-center pt-20 pb-8">
+            <NavBar />
+            <Button onClick={refreshDevices}>Refresh</Button>
+            {deviceList && Array.isArray(deviceList) && deviceList.length > 0 && (
+                <div>
+                    {deviceList.map((device) => (
+                        <ProductCard name={device.name} ip={device.ip} />
+                    ))}
+                </div>
+            )}
+
+        </main>
     );
 }
 
