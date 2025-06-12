@@ -4,30 +4,28 @@ import {
     NavigationMenuLink,
     NavigationMenuList,
 } from "@/components/ui/navigation-menu"
-//import { Link } from 'react-router-dom'
 import { ThemeToggle } from "@/components/custom/theming"
-
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
 
 export function VersionPill(): JSX.Element {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <div className="inline-flex items-center cursor-pointer">
-          <Badge className="rounded-full px-2 py-0 text-xs flex items-center">
-            v2.5.1<ChevronDown className="p-0" />
-          </Badge>
-        </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
-        <DropdownMenuItem>Release Date: June 12, 2025</DropdownMenuItem>
-        <DropdownMenuItem>Changelog</DropdownMenuItem>
-        <DropdownMenuItem>View on GitHub</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <div className="inline-flex items-center cursor-pointer">
+                    <Badge className="rounded-full px-2 py-0 text-xs flex items-center">
+                        v2.5.1<ChevronDown className="p-0" />
+                    </Badge>
+                </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+                <DropdownMenuItem>Release Date: June 12, 2025</DropdownMenuItem>
+                <DropdownMenuItem>Changelog</DropdownMenuItem>
+                <DropdownMenuItem>View on GitHub</DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
 }
 
 
