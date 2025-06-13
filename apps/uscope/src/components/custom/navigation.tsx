@@ -44,10 +44,7 @@ export function NavBar(): JSX.Element {
                                 <Link to="/watch">Discovery</Link>
                             </NavigationMenuItem>
                             <NavigationMenuItem asChild>
-                                <Link to="/something">Something</Link>
-                            </NavigationMenuItem>
-                            <NavigationMenuItem asChild>
-                                <Link to="/about">About</Link>
+                                <Link to="/graphic">Graphic</Link>
                             </NavigationMenuItem>
                         </NavigationMenuList>
                     </NavigationMenu>

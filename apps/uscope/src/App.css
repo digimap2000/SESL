@@ -134,12 +134,16 @@
 html,
 body {
     font-family: 'Geist Sans', ui-sans-serif, system-ui;
+    font-size: 12px;
 }
 
 @layer base {
-    html, body {
+
+    html,
+    body {
         @apply bg-background text-foreground;
     }
+
     * {
         @apply border-border outline-ring/50;
     }

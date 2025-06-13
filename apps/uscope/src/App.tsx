@@ -4,6 +4,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { Button } from "@/components/ui/button";
 import { NavBar } from "@/components/custom/navigation";
 import { ProductCard } from "@/components/custom/cards";
+import { PixiGraph } from "@/components/custom/pixigraph";
 import "./App.css";
 
 function App() {
@@ -12,8 +13,7 @@ function App() {
             <NavBar />
             <Routes>
                 <Route path="/watch" element={<Watch />} />
-                <Route path="/something" element={<Something />} />
-                <Route path="/about" element={<About />} />
+                <Route path="/graphic" element={<Graphic />} />
                 <Route path="*" element={<Home />} />
             </Routes>
         </main>
@@ -21,7 +21,7 @@ function App() {
 }
 
 function Home() {
-    return <div>Welcome Home!</div>;
+    return <div>Home Page</div>;
 }
 
 function Watch() {
@@ -55,12 +55,12 @@ function Watch() {
         </div>);
 }
 
-function Something() {
-    return <div>Something interesting...</div>;
-}
-
-function About() {
-    return <div>About us page</div>;
+function Graphic() {
+    return (
+        <div className="p-4">
+            <PixiGraph />
+        </div>
+    );
 }
 
 export default App;
