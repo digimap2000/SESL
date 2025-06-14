@@ -29,24 +29,36 @@ export function Chart({ className }: { className?: string }) {
             preference: 'webgl',
         });
 
-        const graphics = new Graphics();
-        graphics.clear()
-        graphics.setFillStyle({ color: 'green' })
-        graphics.setStrokeStyle({ width: 2, color: 'red' })
-
-        graphics.rect(0, 0, 100, 100)
-        graphics.fill()
-
-        graphics.moveTo(0, 0)
-        graphics.lineTo(app.renderer.width, app.renderer.height)
-
-
-        app.stage.addChild(graphics);     
-
         // Checking here to see if the component is still mounted, in which case we can continue
         // to append the PixiJS canvas to the container and return the cleanup function.
         if (isMounted() && containerRef.current) {
             containerRef.current.appendChild(app.canvas);
+
+
+            const graphics = new Graphics();
+            app.stage.addChild(graphics);     
+
+            function redraw() {
+
+                console.log('Painting chart');
+
+                graphics.clear()
+                graphics.setFillStyle({ color: 'green' })
+                graphics.setStrokeStyle({ width: 2, color: 'red' })
+
+                graphics.rect(0, 0, 100, 100)
+                graphics.fill()
+
+                graphics.moveTo(0, 0)
+                graphics.lineTo(app.renderer.width, app.renderer.height)
+                graphics.stroke()
+
+                console.log('Chart painted' + app.renderer.width + 'x' + app.renderer.height);
+
+            }
+            window.addEventListener('resize', redraw);
+            redraw();
+
             return () => {
                 app.destroy(true, { children: true, texture: true });
             };
