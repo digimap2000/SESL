@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { useAsyncEffect } from '@/hooks/useAsyncEffect';
-import { Application } from 'pixi.js'
+import { Application, Graphics } from 'pixi.js'
 
 export function Chart({ className }: { className?: string }) {
     const containerRef = useRef<HTMLDivElement>(null)
@@ -22,11 +22,26 @@ export function Chart({ className }: { className?: string }) {
 
         await app.init({
             resizeTo: containerRef.current as HTMLElement,
-            backgroundColor: 0x4000bb,
+            backgroundColor: 0x000000,
+            backgroundAlpha: 0,
             antialias: true,
             resolution: 1,
             preference: 'webgl',
         });
+
+        const graphics = new Graphics();
+        graphics.clear()
+        graphics.setFillStyle({ color: 'green' })
+        graphics.setStrokeStyle({ width: 2, color: 'red' })
+
+        graphics.rect(0, 0, 100, 100)
+        graphics.fill()
+
+        graphics.moveTo(0, 0)
+        graphics.lineTo(app.renderer.width, app.renderer.height)
+
+
+        app.stage.addChild(graphics);     
 
         // Checking here to see if the component is still mounted, in which case we can continue
         // to append the PixiJS canvas to the container and return the cleanup function.
