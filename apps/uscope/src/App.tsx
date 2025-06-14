@@ -4,12 +4,12 @@ import { invoke } from "@tauri-apps/api/core";
 import { Button } from "@/components/ui/button";
 import { NavBar } from "@/components/custom/navigation";
 import { ProductCard } from "@/components/custom/cards";
-import { PixiGraph } from "@/components/custom/pixigraph";
+import { Chart } from "@/components/custom/pixiapp";
 import "./App.css";
 
 function App() {
     return (
-        <main className="flex flex-col min-h-screen items-center justify-center pt-20 pb-8">
+        <main className="flex flex-col min-h-screen items-center justify-center pt-16">
             <NavBar />
             <Routes>
                 <Route path="/watch" element={<Watch />} />
@@ -57,9 +57,7 @@ function Watch() {
 
 function Graphic() {
     return (
-        <div className="p-4">
-            <PixiGraph />
-        </div>
+        <Chart className="flex-1 w-full p-4"/>
     );
 }
 
