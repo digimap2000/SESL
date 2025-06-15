@@ -9,14 +9,18 @@ import "./App.css";
 
 function App() {
     return (
-        <main className="flex flex-col min-h-screen items-center justify-center pt-16">
-            <NavBar />
-            <Routes>
-                <Route path="/watch" element={<Watch />} />
-                <Route path="/graphic" element={<Graphic />} />
-                <Route path="*" element={<Home />} />
-            </Routes>
-        </main>
+        <div className="h-screen flex flex-col">
+            <header className="h-16">
+                <NavBar />
+            </header>
+            <main className="flex-1 flex flex-col items-center justify-center">
+                <Routes>
+                    <Route path="/watch" element={<Watch />} />
+                    <Route path="/graphic" element={<Graphic />} />
+                    <Route path="*" element={<Home />} />
+                </Routes>
+            </main>
+        </div>
     );
 }
 
@@ -57,7 +61,10 @@ function Watch() {
 
 function Graphic() {
     return (
-        <Chart className="flex-1 w-full p-4"/>
+        <div className="flex-1 w-full flex flex-col p-4 gap-4">
+            <Chart className="flex-2 w-full bg-green-400" />
+            <Chart className="flex-1 w-full bg-green-400" />
+        </div>
     );
 }
 

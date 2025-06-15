@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
 import { Link } from 'react-router-dom';
+import { JSX } from "react";
 
 export function VersionPill(): JSX.Element {
     return (
@@ -31,7 +32,7 @@ export function VersionPill(): JSX.Element {
 
 export function NavBar(): JSX.Element {
     return (
-        <nav className="fixed top-0 left-0 right-0 px-4 py-4 backdrop-blur-xl backdrop-opacity-100 border-b border-gray-500 z-50">
+        <nav className="w-full h-full px-4 py-4 border-b border-gray-500">
             <div className="flex items-center space-x-4">
                 {/* Brand */}                
                 <Link to="/"><img src="/upip.png" alt="uScope Logo" className="h-6 w-6 rounded-full" /></Link>

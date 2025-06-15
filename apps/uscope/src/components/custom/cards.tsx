@@ -1,9 +1,11 @@
+
 import {
     Card,
     CardContent,
     CardDescription,
     CardTitle,
 } from "@/components/ui/card"
+import { JSX } from "react";
 
 interface ProductCardProps {
     name: string;

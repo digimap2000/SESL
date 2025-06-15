@@ -3,11 +3,21 @@ import { useAsyncEffect } from '@/hooks/useAsyncEffect';
 import { Application, Graphics } from 'pixi.js'
 
 export function Chart({ className }: { className?: string }) {
-    const containerRef = useRef<HTMLDivElement>(null)
-    //  const appRef = useRef<Application | null>(null)
+    const rootRef = useRef<HTMLDivElement>(null)
+    const canvasRef = useRef<HTMLDivElement>(null)
 
+    function redraw(app: Application, graphics: Graphics) {
+        graphics.clear()
+        graphics.setFillStyle({ color: 'green' })
+        graphics.setStrokeStyle({ width: 2, color: 'red' })
 
-    console.log('Chart component rendered');
+        graphics.rect(0, 0, 100, 100)
+        graphics.fill()
+
+        graphics.moveTo(0, 0)
+        graphics.lineTo(app.renderer.width, app.renderer.height)
+        graphics.stroke()
+    }
 
     //
     // Using our custom useAsyncEffect hook to handle the async initialization of the PixiJS
@@ -17,70 +27,68 @@ export function Chart({ className }: { className?: string }) {
     // 
     useAsyncEffect(async (isMounted) => {
         const app = new Application();
-
-        console.log('Initializing PixiJS application');
-
         await app.init({
-            resizeTo: containerRef.current as HTMLElement,
-            backgroundColor: 0x000000,
-            backgroundAlpha: 0,
-            antialias: true,
-            resolution: 1,
-            preference: 'webgl',
+            resizeTo: undefined,                            //!< We manage resizing ourselves
+            width: rootRef.current?.clientWidth || 640,     //!< Default width if not set
+            height: rootRef.current?.clientHeight || 480,   //!< Default height if not set
+            backgroundAlpha: 0,                             //!< Transparent background
+            antialias: true,                                //!< Enable antialiasing for smoother graphics
+            resolution: 1,                                  //!< Set resolution to 1 for standard display
+            preference: 'webgl',                            //!< WegGL is fully featured and non experimental
         });
 
-        // Checking here to see if the component is still mounted, in which case we can continue
-        // to append the PixiJS canvas to the container and return the cleanup function.
-        if (isMounted() && containerRef.current) {
-            containerRef.current.appendChild(app.canvas);
-
-
-            const graphics = new Graphics();
-            app.stage.addChild(graphics);     
-
-            function redraw() {
-
-                console.log('Painting chart');
-
-                graphics.clear()
-                graphics.setFillStyle({ color: 'green' })
-                graphics.setStrokeStyle({ width: 2, color: 'red' })
-
-                graphics.rect(0, 0, 100, 100)
-                graphics.fill()
-
-                graphics.moveTo(0, 0)
-                graphics.lineTo(app.renderer.width, app.renderer.height)
-                graphics.stroke()
-
-                console.log('Chart painted' + app.renderer.width + 'x' + app.renderer.height);
-
-            }
-            window.addEventListener('resize', redraw);
-            redraw();
-
-            return () => {
-                app.destroy(true, { children: true, texture: true });
-            };
+        // Lets get the error handling out of the way first. There is every chance that React
+        // will unmount the component before the async init completes, so we need to check
+        // if the component is still mounted before we try to append the PixiJS canvas to the
+        // container. If it is not mounted, we can safely destroy the PixiJS application and
+        // return nothing, as the cleanup function will not be called.
+        if (!isMounted() || !canvasRef.current || !rootRef.current) {
+            app.destroy(true, { children: true, texture: true });
+            return;
         }
 
-        // The component is no longer mounted so must have been unmounted before the async 
-        // init completed. We can safely destroy the PixiJS application here and return
-        // nothing, as the cleanup function will not be called.
-        app.destroy(true, { children: true, texture: true });
-        return;
+        const graphics = new Graphics();
+        app.stage.addChild(graphics);
+        redraw(app, graphics);
+
+        // Our fully prepared PixiJS application is now ready to be added to the DOM. It is added
+        // to the canvasRef which is a div that we have created to hold the PixiJS canvas. This floats
+        // above the rootRef which is the main container for the chart sidestepping the resizing
+        // issues that can occur when trying to append the canvas directly to the rootRef and resize it.
+        canvasRef.current.appendChild(app.canvas);
+
+        // We're going to support component resizing using the ResizeObserver API. This calls our 
+        // handler when the root div is resized. We can use the size of this empty, but well behaved,
+        // div to resize the PixiJS application canvas floated in the inner div.
+        const observer = new ResizeObserver(entries => {
+            const { width, height } = entries[0].contentRect;
+            app.renderer.resize(width, height);
+            redraw(app, graphics);
+        });
+        observer.observe(rootRef.current);
+
+        // Cleanup function to destroy the PixiJS application and remove the observer when the component
+        // is unmounted. This ensures we don't leak memory or leave the PixiJS application running
+        // after the component is no longer in the DOM.
+        return () => {
+            app.destroy(true, { children: true, texture: true });
+        };
 
     }, []);
 
     //
-    // Outer div is used to control the layout and styling of the chart.
-    // Inner div is the container for the PixiJS application which will
-    // autosize to fill the available space. This allows the user to supply
-    // a className prop to control the layout of the chart within its parent.
+    // The component layout is slightly unusual. This is to accommodate the
+    // dynamic resizing of the PixiJS application canvas which can be problematic when
+    // shrinking vertically as the application will attempt to overflow the window. 
     //
+    // After some experimentation, I've found the best solution is an outer div defining the
+    // layout and under the control of the user. This remains empty except for parenting a
+    // floating inner div which is sized to cover the entire area of the
+    // outer div and holds the PixiJS application canvas.
+    // 
     return (
-        <div className={`flex flex-col ${className}`}>
-            <div ref={containerRef} className="flex-1 w-full" />
+        <div ref={rootRef} className={className}>
+            <div ref={canvasRef} className="float absolute" />
         </div>
     );
 }
