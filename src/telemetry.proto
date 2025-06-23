@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+message TimeSync
+{
+    int64 now = 0;
+}
+
+message TimeDelta
+{
+    int64 delta = 0;
+}
+

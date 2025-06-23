@@ -51,7 +51,7 @@ export function NavBar(): JSX.Element {
                     </NavigationMenu>
                 </div>
 
-                {/* Nerdy Cornere */}
+                {/* Nerd Corner */}
                 <VersionPill />
                 <ThemeToggle />
             </div>

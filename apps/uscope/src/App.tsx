@@ -62,8 +62,8 @@ function Watch() {
 function Graphic() {
     return (
         <div className="flex-1 w-full flex flex-col p-4 gap-4">
-            <Chart className="flex-2 w-full bg-green-400" />
-            <Chart className="flex-1 w-full bg-green-400" />
+            <Chart className="flex-2 w-full bg-gray-500/5 rounded-lg" />
+            <Chart className="flex-1 w-full bg-gray-500/5 rounded-lg" />
         </div>
     );
 }

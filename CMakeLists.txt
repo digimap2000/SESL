@@ -15,6 +15,7 @@ include_directories(src/ringbuf)
 set(RINGBUF_SOURCES
     src/ringbuf/se_ringbuf.c
     src/ringbuf/se_ringbuf.h
+    src/se_observe.c
 )
 
 set(TEST_SOURCES
