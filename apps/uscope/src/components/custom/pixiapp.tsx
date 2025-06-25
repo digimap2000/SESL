@@ -1,32 +1,11 @@
 import { useRef } from 'react';
 import { useAsyncEffect } from '@/hooks/useAsyncEffect';
-import { Application, Graphics, Text, Rectangle } from 'pixi.js'
-import { createLabelLine } from '@/components/custom/TestLine';
-import { FlexLayout } from './FlexLayout.ts';
-
+import { Application } from 'pixi.js'
+import { Panel } from '@/components/render/panel.ts';
 
 export function Chart({ className }: { className?: string }) {
     const rootRef = useRef<HTMLDivElement>(null)
     const canvasRef = useRef<HTMLDivElement>(null)
-
-    const rcLogical = new Rectangle(0, 0, 1000, 50);
-
-    function redraw(app: Application, graphics: Graphics) {
-        graphics.clear()
-        graphics.setStrokeStyle({ width: 2, color: 'red' })
-
-        graphics.setFillStyle({ color: 'gray', alpha: 0.25 })
-        graphics.roundRect(50, 50, 500, 30, 15)
-        graphics.fill()
-
-        graphics.setFillStyle({ color: 'orange' })
-        graphics.roundRect(50, 50, 300, 30, 15)
-        graphics.fill()
-
-        graphics.moveTo(0, 0)
-        graphics.lineTo(app.renderer.width, app.renderer.height)
-        //    graphics.stroke()
-    }
 
     //
     // Using our custom useAsyncEffect hook to handle the async initialization of the PixiJS
@@ -57,54 +36,9 @@ export function Chart({ className }: { className?: string }) {
             return;
         }
 
-        // Basic text
-
-        const width = rcLogical.width;
-        const height = rcLogical.height;
-
-        const text = new Text({
-            text: `Size: ${width} x ${height}`,
-            style: {
-                fontFamily: 'Geist Sans',
-                fontSize: 16,
-                fill: 'orange',
-            }
-        });
-
-        text.x = 100;
-        text.y = 100;
-
-        //        app.stage.addChild(text);
-
-        const labelLine = createLabelLine("Chart Label", app.renderer.width);
-        labelLine.x = 0;
-        labelLine.y = app.renderer.height / 2;;
-        //      app.stage.addChild(labelLine);
-
-        const graphics = new Graphics();
-        graphics.setFillStyle({ color: 'red', alpha: 0.5 });
-        graphics.roundRect(0, 0, 100, 100, 10);
-        graphics.fill();
-        app.stage.addChild(graphics);
-        //    redraw(app, graphics);
-
-        const graphics2 = new Graphics();
-        graphics2.setFillStyle({ color: 'green', alpha: 0.5 });
-        graphics2.roundRect(0, 0, 100, 100, 10);
-        graphics2.fill();
-        app.stage.addChild(graphics2);
-
-        const graphics3 = new Graphics();
-        graphics3.setFillStyle({ color: 'blue', alpha: 0.5 });
-        graphics3.roundRect(0, 0, 100, 100, 10);
-        graphics3.fill();
-        app.stage.addChild(graphics3);
-
-        const graphics4 = new Graphics();
-        graphics4.setFillStyle({ color: 'orange', alpha: 0.5 });
-        graphics4.roundRect(0, 0, 100, 100, 10);
-        graphics4.fill();
-        app.stage.addChild(graphics4);
+        // A single panel is added to the PixiJS application stage. This is our top level custom
+        // comonent onto which we will add background, panes etc.
+        app.stage.addChild(new Panel());
 
         // Our fully prepared PixiJS application is now ready to be added to the DOM. It is added
         // to the canvasRef which is a div that we have created to hold the PixiJS canvas. This floats
@@ -112,25 +46,27 @@ export function Chart({ className }: { className?: string }) {
         // issues that can occur when trying to append the canvas directly to the rootRef and resize it.
         canvasRef.current.appendChild(app.canvas);
 
+        //
         // We're going to support component resizing using the ResizeObserver API. This calls our 
         // handler when the root div is resized. We can use the size of this empty, but well behaved,
         // div to resize the PixiJS application canvas floated in the inner div.
+        //
+        // We are expecting to see a single child panel but simply stack all the children vertically
+        // and resize them to fit the available space.
+        //
         const observer = new ResizeObserver(entries => {
             const { width, height } = entries[0].contentRect;
-            app.renderer.resize(width, height);
-            //            redraw(app, graphics);
+            app.renderer.resize(width, height);            
+            app.stage.children.forEach((child, index) => {
+                if (child instanceof Panel) {
+                    child.x = 0;
+                    child.y = (height * index) / app.stage.children.length;
+                    child.resize(width, height / app.stage.children.length);
+                }
+            });
+
         });
         observer.observe(rootRef.current);
-
-        const layout = new FlexLayout();
-
-        // Your container must have a `children` array and each child must have x/y/width/height
-        layout.layoutRowFill(app.stage, {
-            gap: 12,
-            padding: 0,
-            maxWidth: app.renderer.width,
-            align: 'center',
-        });
 
         // Cleanup function to destroy the PixiJS application and remove the observer when the component
         // is unmounted. This ensures we don't leak memory or leave the PixiJS application running
