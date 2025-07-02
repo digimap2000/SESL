@@ -4,6 +4,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { Button } from "@/components/ui/button";
 import { NavBar } from "@/components/custom/navigation";
 import { ProductCard } from "@/components/custom/cards";
+import LogViewer from "@/components/custom/LogViewer";
 import { Chart } from "@/components/custom/pixiapp";
 import "./App.css";
 
@@ -25,7 +26,11 @@ function App() {
 }
 
 function Home() {
-    return <div>Home Page</div>;
+    return (
+        <div className="w-full h-full">
+            <LogViewer />
+        </div>        
+    );
 }
 
 function Watch() {
@@ -51,7 +56,7 @@ function Watch() {
                 deviceList && Array.isArray(deviceList) && deviceList.length > 0 && (
                     <div>
                         {deviceList.map((device) => (
-                            <ProductCard name={device.name} ip={device.ip} />
+                            <ProductCard key={device.name} name={device.name} ip={device.ip} />
                         ))}
                     </div>
                 )
