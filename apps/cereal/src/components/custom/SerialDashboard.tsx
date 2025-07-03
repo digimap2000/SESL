@@ -1,6 +1,8 @@
 import { useState } from "react";
 import SerialPortList from "./SerialPortList";
 import LogViewer from "./LogViewer";
+import ConnectionSettings from "./ConnectionSettings";
+import SerialTerminal from "./SerialTerminal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import {
@@ -100,8 +102,9 @@ export default function SerialDashboard() {
           
           <div className="flex-1 p-4">
             <Tabs defaultValue="logs" className="h-full flex flex-col">
-              <TabsList className="grid w-full grid-cols-2 max-w-md">
+              <TabsList className="grid w-full grid-cols-3 max-w-lg">
                 <TabsTrigger value="logs">Log Viewer</TabsTrigger>
+                <TabsTrigger value="connection">Connection</TabsTrigger>
                 <TabsTrigger value="terminal">Serial Terminal</TabsTrigger>
               </TabsList>
               
@@ -122,39 +125,16 @@ export default function SerialDashboard() {
                 </Card>
               </TabsContent>
               
+              <TabsContent value="connection" className="flex-1 mt-4">
+                <ConnectionSettings 
+                  selectedPort={selectedPort}
+                  onConnect={() => console.log('Connect clicked')}
+                  onTest={() => console.log('Test clicked')}
+                />
+              </TabsContent>
+              
               <TabsContent value="terminal" className="flex-1 mt-4">
-                <Card className="h-full">
-                  <CardHeader>
-                    <CardTitle>Serial Terminal</CardTitle>
-                    <CardDescription>
-                      {selectedPort 
-                        ? `Interactive terminal for ${selectedPort}` 
-                        : "Select a serial port to open terminal"
-                      }
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="h-[calc(100%-80px)]">
-                    <div className="h-full bg-black text-green-400 font-mono p-4 rounded-md">
-                      {selectedPort ? (
-                        <div>
-                          <div>Connected to {selectedPort}</div>
-                          <div>Baud rate: 9600</div>
-                          <div className="mt-4 text-gray-400">
-                            # Terminal functionality coming soon...
-                          </div>
-                          <div className="mt-2">
-                            <span className="text-green-400">$ </span>
-                            <span className="animate-pulse">_</span>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="text-gray-400 text-center mt-20">
-                          Select a serial port to start terminal session
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                <SerialTerminal selectedPort={selectedPort} />
               </TabsContent>
             </Tabs>
           </div>

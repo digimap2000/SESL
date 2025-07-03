@@ -1,6 +1,5 @@
-use serialport::{SerialPortInfo, available_ports};
+use serialport::{available_ports};
 use std::time::Duration;
-use std::io::{self, BufRead, BufReader};
 
 pub struct SerialManager {
     // This would hold your actual serial port connections
@@ -52,7 +51,7 @@ impl SerialManager {
             .timeout(Duration::from_millis(1000))
             .open()
         {
-            Ok(mut port) => {
+            Ok(_port) => {
                 // In a real app, you'd read from the port
                 // For demo purposes, let's return some mock data
                 Ok(vec![
