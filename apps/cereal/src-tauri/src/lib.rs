@@ -1,19 +1,32 @@
 use tauri::command;
+use std::sync::{Arc, Mutex};
+use once_cell::sync::Lazy;
 
 mod serial;
 use serial::SerialManager;
+
+mod serialmanager;
+use serialmanager::CerialManager;
+
+// The serial manager is a runtime initialised singleton wrapped in Arc and Mutex
+// to allow shared ownership and thread-safe access across the tauri application.
+static SERIAL_MANAGER: Lazy<Arc<Mutex<CerialManager>>> = Lazy::new(|| {
+    Arc::new(Mutex::new(CerialManager::new()))
+});
+
+#[command]
+fn get_serial_ports() -> Vec<String> {
+    SERIAL_MANAGER.lock()
+        .ok()
+        .and_then(|manager| manager.get_ports().ok())
+        .unwrap_or_default()
+}
 
 #[command]
 fn get_log_chunk(offset: usize, limit: usize) -> Vec<String> {
     (offset..offset + limit)
         .map(|i| format!("Serial Port X, Line {}", i + 1))
         .collect()
-}
-
-#[command]
-fn get_serial_ports() -> Result<Vec<String>, String> {
-    let manager = SerialManager::new();
-    manager.get_available_ports()
 }
 
 #[command]
