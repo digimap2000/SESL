@@ -19,10 +19,11 @@ impl CerialManager {
         }
     }
 
-    pub fn get_ports(&self) -> Result<Vec<String>, String> {
-        let known = self.known_ports.lock()
-            .map_err(|e| format!("Failed to acquire lock: {}", e))?;
-        Ok(known.iter().cloned().collect())
+    pub fn get_ports(&self) -> Vec<String> {
+        let mut ports: Vec<String> = self.known_ports.lock().unwrap()
+            .iter().cloned().collect();
+        ports.sort();
+        ports
     }
 }
 

@@ -17,9 +17,8 @@ static SERIAL_MANAGER: Lazy<Arc<Mutex<CerialManager>>> = Lazy::new(|| {
 #[command]
 fn get_serial_ports() -> Vec<String> {
     SERIAL_MANAGER.lock()
-        .ok()
-        .and_then(|manager| manager.get_ports().ok())
-        .unwrap_or_default()
+        .unwrap()
+        .get_ports()
 }
 
 #[command]
