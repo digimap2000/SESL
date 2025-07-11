@@ -1,0 +1,1 @@
+/Users/andys/Documents/ajs/sesl/apps/cereal/src-tauri/serial_manager/target/debug/libserial_manager.rlib: /Users/andys/Documents/ajs/sesl/apps/cereal/src-tauri/serial_manager/src/discovery.rs /Users/andys/Documents/ajs/sesl/apps/cereal/src-tauri/serial_manager/src/lib.rs /Users/andys/Documents/ajs/sesl/apps/cereal/src-tauri/serial_manager/src/manager.rs
