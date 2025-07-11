@@ -28,7 +28,6 @@ mod discovery;
 
 // Re-export the public API
 pub use manager::{SerialManager, SerialEvent};  // Added SerialEvent
-pub use discovery::{PortEvent, DiscoveryService};
 
 // Re-export common types that users might need
 pub use std::time::{Duration, SystemTime};
